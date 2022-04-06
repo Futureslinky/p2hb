@@ -1,10 +1,7 @@
 import sys
 import traceback
-
 import discord
 from discord.ext import commands, tasks
-import topgg
-
 import config
 
 class Bot(commands.Cog):
@@ -13,9 +10,6 @@ class Bot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.update_status.start()
-
-        self.topggpy = topgg.DBLClient(self.bot, config.DBL_TOKEN)
-        self.update_dbl_stats.start()
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -78,20 +72,9 @@ class Bot(commands.Cog):
         await self.bot.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.watching,
-                name=f">help | {len(self.bot.guilds): ,} servers",
+                name=f"a!help | {len(self.bot.guilds): ,} servers",
             )
         )
-    
-    @tasks.loop(minutes=30)
-    async def update_dbl_stats(self):
-        """This function runs every 30 minutes to automatically update your server count."""
-        await self.bot.wait_until_ready()
-
-        try:
-            server_count = len(self.bot.guilds)
-            await self.topggpy.post_guild_count(server_count)
-        except Exception as e:
-            pass
 
 
 def setup(bot):
